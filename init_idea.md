@@ -3,9 +3,9 @@
 
 ## 개발 환경
 
-* Intellij IDEA Ultimate 2021.1.
-* Java 16
-* Spring Boot 2.5.2
+* Intellij IDEA Ultimate 2022.3.1
+* Java 17
+* Spring Boot 2.7.8
 
 
 ## 기술 스택
