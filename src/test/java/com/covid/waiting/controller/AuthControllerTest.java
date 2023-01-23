@@ -42,7 +42,7 @@ class AuthControllerTest {
         mvc.perform(get("/sign-up"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-                .andExpect(content().string(containsString("This is sign-up page.")))
+                .andExpect(content().string(containsString("This is sign up page.")))
                 .andExpect(view().name("auth/sign-up"));
     }
 }
