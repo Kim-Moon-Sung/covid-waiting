@@ -2,6 +2,8 @@ package com.covid.waiting.controller.api;
 
 import com.covid.waiting.constant.EventStatus;
 import com.covid.waiting.dto.APIDataResponse;
+import com.covid.waiting.dto.EventRequest;
+import com.covid.waiting.dto.EventResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
