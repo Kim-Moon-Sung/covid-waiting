@@ -22,6 +22,7 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -72,7 +73,7 @@ public class APIEventControllerTest {
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.OK.getCode()))
                 .andExpect(jsonPath("$.message").value(ErrorCode.OK.getMessage()));
 
-        verify(eventService).getEvents(any(), any(), any(), any(), any());
+        then(eventService).should().getEvents(any(), any(), any(), any(), any());
     }
 
     @DisplayName("[API][POST] 이벤트 생성")
@@ -103,7 +104,7 @@ public class APIEventControllerTest {
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.OK.getCode()))
                 .andExpect(jsonPath("$.message").value(ErrorCode.OK.getMessage()));
 
-        verify(eventService).createEvent(any());
+        then(eventService).should().createEvent(any());
     }
 
     @DisplayName("[API][GET] 단일 이벤트 조회 - 이벤트 있는 경우, 이벤트 데이터를 담은 표준 API 출력")
@@ -133,7 +134,7 @@ public class APIEventControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.OK.getCode()))
                 .andExpect(jsonPath("$.message").value(ErrorCode.OK.getMessage()));
-        verify(eventService).getEvent(eventId);
+        then(eventService).should().getEvent(eventId);
     }
 
     @DisplayName("[API][GET] 단일 이벤트 조회 - 이벤트 없는 경우, 빈 표준 API 출력")
@@ -152,7 +153,7 @@ public class APIEventControllerTest {
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.OK.getCode()))
                 .andExpect(jsonPath("$.message").value(ErrorCode.OK.getMessage()));
 
-        verify(eventService).getEvent(eventId);
+        then(eventService).should().getEvent(eventId);
     }
 
     @DisplayName("[API][PUT] 이벤트 변경")
@@ -182,7 +183,7 @@ public class APIEventControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.OK.getCode()))
                 .andExpect(jsonPath("$.message").value(ErrorCode.OK.getMessage()));
-        verify(eventService).modifyEvent(eq(eventId), any());
+        then(eventService).should().modifyEvent(eq(eventId), any());
     }
 
     @DisplayName("[API][DELETE] 이벤트 삭제")
@@ -199,7 +200,7 @@ public class APIEventControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.OK.getCode()))
                 .andExpect(jsonPath("$.message").value(ErrorCode.OK.getMessage()));
-        verify(eventService).removeEvent(eq(eventId));
+        then(eventService).should().removeEvent(eq(eventId));
     }
 
     private EventDTO createEventDTO() {
