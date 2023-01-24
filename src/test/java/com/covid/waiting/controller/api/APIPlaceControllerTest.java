@@ -50,6 +50,7 @@ public class APIPlaceControllerTest {
     }
 
     @DisplayName("[API][POST] 장소 생성")
+    @Test
     void givenPlace_whenCreatingAPlace_thenReturnsSuccessfulStandardResponse() throws Exception {
         //given
         PlaceRequest placeRequest = PlaceRequest.of(
@@ -69,7 +70,8 @@ public class APIPlaceControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.errorCode").value(ErrorCode.OK.getMessage()));
+                .andExpect(jsonPath("$.errorCode").value(ErrorCode.OK.getCode()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.OK.getMessage()));
     }
 
     @DisplayName("[API][GET] 단일 장소 조회 - 장소 있는 경우, 장소 데이터를 담은 표준 API 출력")
