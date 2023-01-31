@@ -260,7 +260,7 @@ public class APIEventControllerTest {
                 null,
                 null,
                 null,
-                1-,
+                -1,
                 0,
                 "마스크 꼭 착용하세요"
         );
