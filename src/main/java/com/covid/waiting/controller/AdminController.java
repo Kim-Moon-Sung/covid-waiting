@@ -50,8 +50,6 @@ public class AdminController {
     public ModelAndView adminEvents(Long placeId, String eventName, EventStatus eventStatus,
                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime eventStartDatetime,
                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime eventEndDatetime) {
-
-
         Map<String, Object> map = new HashMap<>();
         map.put("placeName", "place-" + placeId);
         map.put("eventName", eventName);
@@ -65,6 +63,7 @@ public class AdminController {
     public ModelAndView adminEventDetail(@PathVariable Long eventId) {
         Map<String, Object> map = new HashMap<>();
         map.put("event", EventDTO.of(
+                eventId,
                 1L,
                 "오후 운동",
                 EventStatus.OPENED,
