@@ -123,6 +123,6 @@ class ErrorCodeTest {
         assertThat(t)
                 .isInstanceOf(GeneralException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INTERNAL_ERROR)
-                .hasMessage("HttpStatus is null.")
+                .hasMessage("HttpStatus is null.");
     }
 }
