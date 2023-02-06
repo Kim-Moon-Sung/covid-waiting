@@ -1,6 +1,5 @@
 package com.covid.waiting.domain;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,13 +9,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @ToString
-@EqualsAndHashCode
 @Table(indexes = {
         @Index(columnList = "phoneNumber"),
-        @Index(columnList = "createdAt"),
         @Index(columnList = "modifiedAt")
 })
 @EntityListeners(AuditingEntityListener.class)
@@ -67,5 +65,17 @@ public class Admin {
 
     public static Admin of(String email, String nickname, String password, String phoneNumber, String memo) {
         return new Admin(email, nickname, password, phoneNumber, memo);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        return id != null && id.equals(((Admin) obj).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(email, nickname, phoneNumber, createdAt, modifiedAt);
     }
 }
