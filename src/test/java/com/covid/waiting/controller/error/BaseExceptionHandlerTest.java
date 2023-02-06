@@ -35,7 +35,7 @@ public class BaseExceptionHandlerTest {
         assertThat(result)
                 .hasFieldOrPropertyWithValue("viewName", "error")
                 .extracting(ModelAndView::getModel, as(InstanceOfAssertFactories.MAP))
-                .containsEntry("status", errorCode.getHttpStatus().value())
+                .containsEntry("statusCode", errorCode.getHttpStatus().value())
                 .containsEntry("errorCode", errorCode)
                 .containsEntry("message", errorCode.getMessage());
     }
