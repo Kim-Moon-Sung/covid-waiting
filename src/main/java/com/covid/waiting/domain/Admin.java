@@ -9,7 +9,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @ToString
@@ -62,6 +64,10 @@ public class Admin {
         this.phoneNumber = phoneNumber;
         this.memo = memo;
     }
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "admin")
+    private final Set<AdminPlaceMap> adminPlaceMaps = new LinkedHashSet<>();
 
     public static Admin of(String email, String nickname, String password, String phoneNumber, String memo) {
         return new Admin(email, nickname, password, phoneNumber, memo);
