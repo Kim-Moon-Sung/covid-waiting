@@ -1,6 +1,7 @@
 package com.covid.waiting.repository.querydsl;
 
 import com.covid.waiting.constant.EventStatus;
+import com.covid.waiting.dto.EventViewResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,13 +1,21 @@
 package com.covid.waiting.repository.querydsl;
 
+import com.covid.waiting.constant.ErrorCode;
 import com.covid.waiting.constant.EventStatus;
 import com.covid.waiting.domain.Event;
 import com.covid.waiting.domain.QEvent;
+import com.covid.waiting.dto.EventViewResponse;
+import com.covid.waiting.exception.GeneralException;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPQLQuery;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 public class EventRepositoryCustomImpl extends QuerydslRepositorySupport implements EventRepositoryCustom {
 
