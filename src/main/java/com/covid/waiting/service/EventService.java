@@ -4,10 +4,13 @@ import com.covid.waiting.constant.ErrorCode;
 import com.covid.waiting.constant.EventStatus;
 import com.covid.waiting.domain.Place;
 import com.covid.waiting.dto.EventDTO;
+import com.covid.waiting.dto.EventViewResponse;
 import com.covid.waiting.exception.GeneralException;
 import com.covid.waiting.repository.EventRepository;
 import com.covid.waiting.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.querydsl.core.types.Predicate;
@@ -33,12 +36,13 @@ public class EventService {
         }
     }
 
-    public List<EventDTO> getEvents(
-            Long placeId,
+    public Page<EventViewResponse> getEventViewResponse(
+            String placeName,
             String eventName,
             EventStatus eventStatus,
             LocalDateTime eventStartDatetime,
-            LocalDateTime eventEndDatetime) {
+            LocalDateTime eventEndDatetime,
+            Pageable pageable) {
 
         try {
             return null;
