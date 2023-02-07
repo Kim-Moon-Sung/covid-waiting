@@ -2,9 +2,11 @@ package com.covid.waiting.service;
 
 import com.covid.waiting.constant.ErrorCode;
 import com.covid.waiting.constant.EventStatus;
+import com.covid.waiting.domain.Place;
 import com.covid.waiting.dto.EventDTO;
 import com.covid.waiting.exception.GeneralException;
 import com.covid.waiting.repository.EventRepository;
+import com.covid.waiting.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import java.util.stream.StreamSupport;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final PlaceRepository placeRepository;
 
     public List<EventDTO> getEvents(Predicate predicate) {
         try {
@@ -58,7 +61,9 @@ public class EventService {
                 return false;
             }
 
-            eventRepository.save(eventDTO.toEntity());
+            Place place = placeRepository.findById(eventDTO.placeDTO().id())
+                    .orElseThrow(() -> new GeneralException(ErrorCode.NOT_FOUND));
+            eventRepository.save(eventDTO.toEntity(place));
             return true;
         } catch (Exception e) {
             throw new GeneralException(ErrorCode.DATA_ACCESS_ERROR, e);

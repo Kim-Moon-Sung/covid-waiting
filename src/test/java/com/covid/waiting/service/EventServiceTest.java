@@ -2,10 +2,13 @@ package com.covid.waiting.service;
 
 import com.covid.waiting.constant.ErrorCode;
 import com.covid.waiting.constant.EventStatus;
+import com.covid.waiting.constant.PlaceType;
 import com.covid.waiting.domain.Event;
+import com.covid.waiting.domain.Place;
 import com.covid.waiting.dto.EventDTO;
 import com.covid.waiting.exception.GeneralException;
 import com.covid.waiting.repository.EventRepository;
+import com.covid.waiting.repository.PlaceRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +34,7 @@ class EventServiceTest {
 
     @InjectMocks private EventService sut;
     @Mock private EventRepository eventRepository;
+    @Mock private PlaceRepository placeRepository;
 
     @DisplayName("이벤트를 검색하면, 결과를 출력하여 보여준다.")
     @Test
@@ -37,8 +42,8 @@ class EventServiceTest {
         //given
         given(eventRepository.findAll(any(Predicate.class)))
                 .willReturn(List.of(
-                        createEvent(1L, "오전 운동", true),
-                        createEvent(1L, "오전 운동", false)
+                        createEvent("오전 운동", true),
+                        createEvent("오전 운동", false)
                 ));
 
         //when
@@ -71,7 +76,7 @@ class EventServiceTest {
     void givenEventId_whenSearchingExistingEvent_thenReturnsEvent() {
         //given
         long eventId = 1L;
-        Event event = createEvent(1L, "오전 운동", true);
+        Event event = createEvent("오전 운동", true);
         given(eventRepository.findById(eventId)).willReturn(Optional.of(event));
 
         //when
@@ -118,15 +123,17 @@ class EventServiceTest {
     @Test
     void givenEvent_whenCreating_thenCreatesEventAndReturnsTrue() {
         // Given
-        Event event = createEvent(1L, "오후 운동", false);
-        given(eventRepository.save(event)).willReturn(event);
+        EventDTO eventDto = EventDTO.of(createEvent("오후 운동", false));
+        given(placeRepository.findById(eventDto.placeDTO().id())).willReturn(Optional.of(createPlace()));
+        given(eventRepository.save(any(Event.class))).willReturn(any());
 
         // When
-        boolean result = sut.createEvent(EventDTO.of(event));
+        boolean result = sut.createEvent(eventDto);
 
         // Then
         assertThat(result).isTrue();
-        then(eventRepository).should().save(event);
+        then(placeRepository).should().findById(eventDto.placeDTO().id());
+        then(eventRepository).should().save(any(Event.class));
     }
 
     @DisplayName("이벤트 정보를 주지 않으면, 생성 중단하고 결과를 false 로 보여준다.")
@@ -139,6 +146,25 @@ class EventServiceTest {
 
         // Then
         assertThat(result).isFalse();
+        then(placeRepository).shouldHaveNoInteractions();
+        then(eventRepository).shouldHaveNoInteractions();
+    }
+
+    @DisplayName("이벤트 생성 중 장소 정보가 틀리거나 없으면, 줄서기 프로젝트 기본 에러로 전환하여 예외 던진다")
+    @Test
+    void givenWrongPlaceId_whenCreating_thenThrowsGeneralException() {
+        // Given
+        Event event = createEvent(null, false);
+        given(placeRepository.findById(event.getPlace().getId())).willReturn(Optional.empty());
+
+        // When
+        Throwable thrown = catchThrowable(() -> sut.createEvent(EventDTO.of(event)));
+
+        // Then
+        assertThat(thrown)
+                .isInstanceOf(GeneralException.class)
+                .hasMessageContaining(ErrorCode.DATA_ACCESS_ERROR.getMessage());
+        then(placeRepository).should().findById(event.getPlace().getId());
         then(eventRepository).shouldHaveNoInteractions();
     }
 
@@ -146,8 +172,9 @@ class EventServiceTest {
     @Test
     void givenDataRelatedException_whenCreating_thenThrowsGeneralException() {
         // Given
-        Event event = createEvent(0L, null, false);
+        Event event = createEvent(null, false);
         RuntimeException e = new RuntimeException("This is test");
+        given(placeRepository.findById(event.getPlace().getId())).willReturn(Optional.of(createPlace()));
         given(eventRepository.save(any())).willThrow(e);
 
         // When
@@ -157,6 +184,7 @@ class EventServiceTest {
         assertThat(thrown)
                 .isInstanceOf(GeneralException.class)
                 .hasMessageContaining(ErrorCode.DATA_ACCESS_ERROR.getMessage());
+        then(placeRepository).should().findById(event.getPlace().getId());
         then(eventRepository).should().save(any());
     }
 
@@ -165,8 +193,8 @@ class EventServiceTest {
     void givenEventIdAndItsInfo_whenModifying_thenModifiesEventAndReturnsTrue() {
         // Given
         long eventId = 1L;
-        Event originalEvent = createEvent(1L, "오후 운동", false);
-        Event changedEvent = createEvent(1L, "오전 운동", true);
+        Event originalEvent = createEvent("오후 운동", false);
+        Event changedEvent = createEvent("오전 운동", true);
         given(eventRepository.findById(eventId)).willReturn(Optional.of(originalEvent));
         given(eventRepository.save(changedEvent)).willReturn(changedEvent);
 
@@ -175,6 +203,10 @@ class EventServiceTest {
 
         // Then
         assertThat(result).isTrue();
+        assertThat(originalEvent.getEventName()).isEqualTo(changedEvent.getEventName());
+        assertThat(originalEvent.getEventStartDatetime()).isEqualTo(changedEvent.getEventStartDatetime());
+        assertThat(originalEvent.getEventEndDatetime()).isEqualTo(changedEvent.getEventEndDatetime());
+        assertThat(originalEvent.getEventStatus()).isEqualTo(changedEvent.getEventStatus());
         then(eventRepository).should().findById(eventId);
         then(eventRepository).should().save(changedEvent);
     }
@@ -183,7 +215,7 @@ class EventServiceTest {
     @Test
     void givenNoEventId_whenModifying_thenAbortModifyingAndReturnsFalse() {
         // Given
-        Event event = createEvent(1L, "오후 운동", false);
+        Event event = createEvent("오후 운동", false);
 
         // When
         boolean result = sut.modifyEvent(null, EventDTO.of(event));
@@ -212,8 +244,8 @@ class EventServiceTest {
     void givenDataRelatedException_whenModifying_thenThrowsGeneralException() {
         // Given
         long eventId = 1L;
-        Event originalEvent = createEvent(1L, "오후 운동", false);
-        Event wrongEvent = createEvent(0L, null, false);
+        Event originalEvent = createEvent("오후 운동", false);
+        Event wrongEvent = createEvent(null, false);
         RuntimeException e = new RuntimeException("This is test.");
 
         given(eventRepository.findById(eventId)).willReturn(Optional.of(originalEvent));
@@ -276,13 +308,13 @@ class EventServiceTest {
         then(eventRepository).should().deleteById(eventId);
     }
 
-
-    private Event createEvent(long placeId, String eventName, boolean isMorning) {
+    private Event createEvent(String eventName, boolean isMorning) {
         String hourStart = isMorning ? "09" : "13";
         String hourEnd = isMorning ? "12" : "16";
 
         return createEvent(
-                placeId,
+                1L,
+                1L,
                 eventName,
                 EventStatus.OPENED,
                 LocalDateTime.parse("2023-01-01T%s:00:00".formatted(hourStart)),
@@ -291,14 +323,15 @@ class EventServiceTest {
     }
 
     private Event createEvent(
+            long id,
             long placeId,
             String eventName,
             EventStatus eventStatus,
             LocalDateTime eventStartDateTime,
             LocalDateTime eventEndDateTime
     ) {
-        return Event.of(
-                placeId,
+        Event event = Event.of(
+                createPlace(placeId),
                 eventName,
                 eventStatus,
                 eventStartDateTime,
@@ -307,5 +340,19 @@ class EventServiceTest {
                 24,
                 "마스크 꼭 착용하세요"
         );
+        ReflectionTestUtils.setField(event, "id", id);
+
+        return event;
+    }
+
+    private Place createPlace() {
+        return createPlace(1L);
+    }
+
+    private Place createPlace(long id) {
+        Place place = Place.of(PlaceType.COMMON, "test place", "test address", "010-1234-1234", 10, null);
+        ReflectionTestUtils.setField(place, "id", id);
+
+        return place;
     }
 }
