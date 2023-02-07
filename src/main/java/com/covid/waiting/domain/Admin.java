@@ -66,6 +66,7 @@ public class Admin {
     }
 
     @ToString.Exclude
+    @OrderBy("id")
     @OneToMany(mappedBy = "admin")
     private final Set<AdminPlaceMap> adminPlaceMaps = new LinkedHashSet<>();
 
