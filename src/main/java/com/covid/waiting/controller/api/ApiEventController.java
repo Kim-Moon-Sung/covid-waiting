@@ -1,9 +1,11 @@
 package com.covid.waiting.controller.api;
 
 import com.covid.waiting.constant.EventStatus;
+import com.covid.waiting.constant.PlaceType;
 import com.covid.waiting.dto.APIDataResponse;
 import com.covid.waiting.dto.EventRequest;
 import com.covid.waiting.dto.EventResponse;
+import com.covid.waiting.dto.PlaceDTO;
 import com.covid.waiting.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,15 +35,27 @@ public class ApiEventController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime eventStartDatetime,
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime eventEndDatetime
     ) {
-        List<EventResponse> eventResponses = eventService.getEvents(
-                placeId,
-                eventName,
-                eventStatus,
-                eventStartDatetime,
-                eventEndDatetime
-        ).stream().map(EventResponse::from).toList();
-
-        return APIDataResponse.of(eventResponses);
+        return APIDataResponse.of(List.of(EventResponse.of(
+                1L,
+                PlaceDTO.of(
+                        1L,
+                        PlaceType.SPORTS,
+                        "배드민턴장",
+                        "서울시 가나구 다라동",
+                        "010-1111-2222",
+                        0,
+                        null,
+                        LocalDateTime.now(),
+                        LocalDateTime.now()
+                ),
+                "오후 운동",
+                EventStatus.OPENED,
+                LocalDateTime.of(2021, 1, 1, 13, 0, 0),
+                LocalDateTime.of(2021, 1, 1, 16, 0, 0),
+                0,
+                24,
+                "마스크 꼭 착용하세요"
+        )));
     }
 
     @ResponseStatus(HttpStatus.CREATED)

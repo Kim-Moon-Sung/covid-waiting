@@ -2,6 +2,7 @@ package com.covid.waiting.repository;
 
 import com.covid.waiting.domain.Event;
 import com.covid.waiting.domain.QEvent;
+import com.covid.waiting.repository.querydsl.EventRepositoryCustom;
 import com.querydsl.core.types.dsl.ComparableExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,7 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 
 public interface EventRepository extends
         JpaRepository<Event, Long>,
+        EventRepositoryCustom,
         QuerydslPredicateExecutor<Event>,
         QuerydslBinderCustomizer<QEvent> {
 

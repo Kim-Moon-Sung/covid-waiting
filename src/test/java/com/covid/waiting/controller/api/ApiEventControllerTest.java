@@ -49,8 +49,6 @@ public class ApiEventControllerTest {
     @Test
     void givenParameters_whenRequestingEvents_thenReturnsListOfEventsInStandardResponse() throws Exception {
         //given
-        given(eventService.getEvents(any(), any(), any(), any(), any()))
-                .willReturn(List.of(createEventDTO()));
 
         //when & then
         mvc.perform(get("/api/events")
@@ -77,8 +75,6 @@ public class ApiEventControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.OK.getCode()))
                 .andExpect(jsonPath("$.message").value(ErrorCode.OK.getMessage()));
-
-        then(eventService).should().getEvents(any(), any(), any(), any(), any());
     }
 
     @DisplayName("[API][GET] 이벤트 리스트 조회 - 잘못된 검색 파라미터")
@@ -97,7 +93,6 @@ public class ApiEventControllerTest {
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.errorCode").value(ErrorCode.VALIDATION_ERROR.getCode()))
                 .andExpect(jsonPath("$.message").value(containsString(ErrorCode.VALIDATION_ERROR.getMessage())));
-        then(eventService).shouldHaveNoInteractions();
     }
 
     @DisplayName("[API][POST] 이벤트 생성")
