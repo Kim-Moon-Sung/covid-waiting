@@ -11,6 +11,7 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 
 public interface EventRepository extends
         JpaRepository<Event, Long>,
+        EventRepositoryCustom,
         QuerydslPredicateExecutor<Event>,
         QuerydslBinderCustomizer<QEvent> {
 
